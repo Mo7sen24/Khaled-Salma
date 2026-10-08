@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دعوة زفاف</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f9f6f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background: #ffffff;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* شاشة الباب / الغلاف */
+    .door-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      perspective: 1200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      transition: opacity 1s ease 1.2s, visibility 1s ease 1.2s;
+    }
+
+    .door-wrapper.opened {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* خلفية الباب الإطار والزهور */
+    .door-frame {
+      width: 100%;
+      height: 100%;
+      background: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000') center/cover no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .door {
+      width: 45%;
+      height: 70%;
+      background: #5c3a21;
+      border: 4px solid #3d2412;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+      position: relative;
+      transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+
+    .door-left {
+      border-radius: 100px 0 0 0;
+      transform-origin: left center;
+      border-right: 2px solid #2a180b;
+    }
+
+    .door-right {
+      border-radius: 0 100px 0 0;
+      transform-origin: right center;
+      border-left: 2px solid #2a180b;
+    }
+
+    /* مقابض الأبواب */
+    .door-left::after, .door-right::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      background: #d4af37;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    .door-left::after { right: 10px; }
+    .door-right::after { left: 10px; }
+
+    /* عند فتح الباب */
+    .door-wrapper.opened .door-left {
+      transform: rotateY(-110deg);
+    }
+    .door-wrapper.opened .door-right {
+      transform: rotateY(110deg);
+    }
+
+    /* النص الظاهر على الأبواب قبل الفتح */
+    .door-title {
+      position: absolute;
+      bottom: 20%;
+      color: #fff;
+      font-size: 22px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      z-index: 12;
+      text-align: center;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .door-wrapper.opened .door-title {
+      opacity: 0;
+    }
+
+    /* محتوى الدعوة الداخلي */
+    .content {
+      padding: 40px 20px;
+      text-align: center;
+      color: #4a4a4a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      background: linear-gradient(to bottom, #fffaf6, #ffffff);
+    }
+
+    .names {
+      font-size: 28px;
+      color: #8b5a2b;
+      margin-top: 20px;
+    }
+
+    .quran-verse {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #666;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+      padding: 15px 0;
+    }
+
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border: 1px solid #f0e6df;
+    }
+
+    .btn {
+      background: #8b5a2b;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- شاشة الأبواب -->
+  <div class="door-wrapper" id="doorWrapper" onclick="openDoor()">
+    <div class="door-title">محمد & زينب<br><small style="font-size: 14px;">اضغط للفتح</small></div>
+    <div class="door-frame">
+      <div class="door door-left"></div>
+      <div class="door door-right"></div>
+    </div>
+  </div>
+
+  <!-- صوت عند الفتح (اختياري) -->
+  <audio id="bgMusic" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+  <!-- محتوى الدعوة -->
+  <div class="content">
+    <div class="names">محمد & زينب</div>
+    
+    <div class="quran-verse">
+      "وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً"
+    </div>
+
+    <div class="card">
+      <h3>بطاقة دعوة</h3>
+      <p style="margin-top: 10px; font-size: 14px; color: #777;">
+        يسرنا دعوتكم لحضور حفل زفافنا وتكتمل فرحتنا بوجودكم معنا.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>برنامج الحفل</h3>
+      <p style="margin-top: 8px;">⏰ 7:30 مساءً - استقبال الضيوف</p>
+      <p style="margin-top: 8px;">⏰ 8:30 مساءً - العشاء</p>
+    </div>
+
+    <div class="card">
+      <h3>تأكيد الحضور</h3>
+      <button class="btn">تأكيد الحضور عبر واتساب</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openDoor() {
+    const doorWrapper = document.getElementById('doorWrapper');
+    const music = document.getElementById('bgMusic');
+    
+    // إضافة كلاس الفتح لفتح الأبواب
+    doorWrapper.classList.add('opened');
+    
+    // تشغيل الموسيقى عند الفتح
+    if(music) {
+      music.play().catch(e => console.log("Audio play blocked"));
+    }
+  }
+</script>
+
+</body>
+</html>
