@@ -18,7 +18,6 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
     .container {
@@ -31,100 +30,46 @@
       overflow: hidden;
     }
 
-    /* شاشة الباب / الغلاف */
-    .door-wrapper {
+    /* حاوية الفيديو للمقدمة */
+    .video-intro {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 10;
-      perspective: 1200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       background: #000;
-      transition: opacity 1s ease 1.2s, visibility 1s ease 1.2s;
+      transition: opacity 1s ease, visibility 1s ease;
     }
 
-    .door-wrapper.opened {
+    .video-intro video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* نص وشاشة البدء قبل تشغيل الفيديو */
+    .play-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      cursor: pointer;
+      z-index: 11;
+    }
+
+    /* إخفاء شاشة الفيديو بعد انتهاء العرض */
+    .video-intro.hidden {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
-    }
-
-    /* خلفية الباب الإطار والزهور */
-    .door-frame {
-      width: 100%;
-      height: 100%;
-      background: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000') center/cover no-repeat;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-
-    .door {
-      width: 45%;
-      height: 70%;
-      background: #5c3a21;
-      border: 4px solid #3d2412;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-      position: relative;
-      transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
-      transform-style: preserve-3d;
-      cursor: pointer;
-    }
-
-    .door-left {
-      border-radius: 100px 0 0 0;
-      transform-origin: left center;
-      border-right: 2px solid #2a180b;
-    }
-
-    .door-right {
-      border-radius: 0 100px 0 0;
-      transform-origin: right center;
-      border-left: 2px solid #2a180b;
-    }
-
-    /* مقابض الأبواب */
-    .door-left::after, .door-right::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 12px;
-      height: 12px;
-      background: #d4af37;
-      border-radius: 50%;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    }
-    .door-left::after { right: 10px; }
-    .door-right::after { left: 10px; }
-
-    /* عند فتح الباب */
-    .door-wrapper.opened .door-left {
-      transform: rotateY(-110deg);
-    }
-    .door-wrapper.opened .door-right {
-      transform: rotateY(110deg);
-    }
-
-    /* النص الظاهر على الأبواب قبل الفتح */
-    .door-title {
-      position: absolute;
-      bottom: 20%;
-      color: #fff;
-      font-size: 22px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      z-index: 12;
-      text-align: center;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-    }
-
-    .door-wrapper.opened .door-title {
-      opacity: 0;
     }
 
     /* محتوى الدعوة الداخلي */
@@ -178,19 +123,22 @@
 <body>
 
 <div class="container">
-  <!-- شاشة الأبواب -->
-  <div class="door-wrapper" id="doorWrapper" onclick="openDoor()">
-    <div class="door-title">محمد & زينب<br><small style="font-size: 14px;">اضغط للفتح</small></div>
-    <div class="door-frame">
-      <div class="door door-left"></div>
-      <div class="door door-right"></div>
+  
+  <!-- فيديو فتح الباب -->
+  <div class="video-intro" id="videoWrapper">
+    <div class="play-overlay" id="playOverlay" onclick="startVideo()">
+      <h2 style="font-size: 24px; margin-bottom: 10px;">محمد & زينب</h2>
+      <p style="font-size: 16px;">اضغط لفتح الدعوة ✉️</p>
     </div>
+    
+    <!-- قم بوضع اسم ملف الفيديو الخاص بك مكان door_video.mp4 -->
+    <video id="doorVideo" playsinline preload="auto">
+      <source src="video.mp4" type="video/mp4">
+      متصفحك لا يدعم تشغيل الفيديو.
+    </video>
   </div>
 
-  <!-- صوت عند الفتح (اختياري) -->
-  <audio id="bgMusic" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
-
-  <!-- محتوى الدعوة -->
+  <!-- محتوى الدعوة (يظهر بعد انتهاء الفيديو) -->
   <div class="content">
     <div class="names">محمد & زينب</div>
     
@@ -206,30 +154,33 @@
     </div>
 
     <div class="card">
-      <h3>برنامج الحفل</h3>
-      <p style="margin-top: 8px;">⏰ 7:30 مساءً - استقبال الضيوف</p>
-      <p style="margin-top: 8px;">⏰ 8:30 مساءً - العشاء</p>
+      <h3>تفاصيل الحفل</h3>
+      <p style="margin-top: 8px;">⏰ 7:30 مساءً - استقبال الضيوف</p>      <p style="margin-top: 8px;">📍 القاعة الكبرى</p>
     </div>
 
     <div class="card">
-      <h3>تأكيد الحضور</h3>
-      <button class="btn">تأكيد الحضور عبر واتساب</button>
+      <button class="btn">تأكيد الحضور</button>
     </div>
   </div>
+
 </div>
 
 <script>
-  function openDoor() {
-    const doorWrapper = document.getElementById('doorWrapper');
-    const music = document.getElementById('bgMusic');
-    
-    // إضافة كلاس الفتح لفتح الأبواب
-    doorWrapper.classList.add('opened');
-    
-    // تشغيل الموسيقى عند الفتح
-    if(music) {
-      music.play().catch(e => console.log("Audio play blocked"));
-    }
+  function startVideo() {
+    const video = document.getElementById('doorVideo');
+    const overlay = document.getElementById('playOverlay');
+    const videoWrapper = document.getElementById('videoWrapper');
+
+    // إخفاء النص عند الضغط للبدء
+    overlay.style.display = 'none';
+
+    // تشغيل الفيديو
+    video.play();
+
+    // عند انتهاء الفيديو يتم إخفاء واجهة الفيديو لإظهار باقي الدعوة
+    video.onended = function() {
+      videoWrapper.classList.add('hidden');
+    };
   }
 </script>
 
